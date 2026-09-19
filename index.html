@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>جشن نوروز ۱۴۰۶</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:100%;height:100%;overflow:hidden;background:#0a1428;
+    font-family:'Vazirmatn',Tahoma,'Segoe UI',sans-serif;color:#fff;
+    -webkit-tap-highlight-color:transparent}
+  canvas{display:block;position:fixed;inset:0;z-index:1}
+
+  #hud{position:fixed;inset:0;z-index:3;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;pointer-events:none;text-align:center;padding:20px}
+
+  #cdlabel{
+    font-family:'Vazirmatn',Tahoma,sans-serif;
+    font-size:clamp(14px,2.1vw,20px);
+    letter-spacing:.14em;
+    color:#ffe9a8;
+    font-weight:700;
+    text-shadow:0 2px 12px rgba(120,60,0,.95),0 0 30px rgba(255,190,60,.85);
+    margin-bottom:14px;
+    opacity:0;
+    transition:opacity .7s ease;
+    pointer-events:none;
+  }
+  #hud.revealed #cdlabel{
+    opacity:.9;
+  }
+
+  #centerStage{
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    min-height:1.4em;
+    transition:opacity .6s ease;
+  }
+  #centerStage.hide{opacity:0}
+
+  #cd{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    font-family:'Vazirmatn',Tahoma,sans-serif;
+    font-size:clamp(56px,13vw,150px);
+    font-weight:900;
+    line-height:1.1;
+    background:linear-gradient(180deg,#ffffff,#ffe98a 45%,#ff9a2e);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 4px 8px rgba(110,50,0,.6)) drop-shadow(0 0 45px rgba(255,180,60,.9));
+    letter-spacing:.02em;
+    white-space:nowrap;
+    direction:ltr;
+    opacity:0;
+    transition:opacity .7s ease, filter .7s ease;
+    pointer-events:none;
+  }
+  #centerStage.revealed #cd{
+    opacity:1;
+    filter:drop-shadow(0 4px 10px rgba(110,50,0,.7))
+           drop-shadow(0 0 55px rgba(255,180,60,1))
+           drop-shadow(0 0 100px rgba(255,120,20,.75));
+  }
+
+  #clickHint{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    font-family:'Vazirmatn',Tahoma,sans-serif;
+    font-size:clamp(20px,3.4vw,40px);
+    font-weight:900;
+    line-height:1.2;
+    background:linear-gradient(180deg,#ffffff,#ffe98a 45%,#ff9a2e);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 4px 8px rgba(110,50,0,.6)) drop-shadow(0 0 45px rgba(255,180,60,.9));
+    letter-spacing:-.01em;
+    white-space:nowrap;
+    padding:0;
+    border:none;
+    background-color:transparent;
+    cursor:pointer;
+    user-select:none;
+    opacity:1;
+    transition:opacity .7s ease;
+    animation:pulseHint 1.8s ease-in-out infinite;
+    max-width:96vw;
+  }
+  #centerStage.revealed #clickHint{
+    opacity:0;
+    animation:none;
+  }
+  #clickHint.removed{display:none}
+
+  @keyframes pulseHint{
+    0%,100%{filter:drop-shadow(0 4px 8px rgba(110,50,0,.6)) drop-shadow(0 0 45px rgba(255,180,60,.9))}
+    50%    {filter:drop-shadow(0 4px 8px rgba(110,50,0,.6)) drop-shadow(0 0 65px rgba(255,200,80,1))}
+  }
+
+  #final{position:absolute;opacity:0;transform:scale(.5) translateY(20px);padding:0 16px;max-width:96vw}
+  #final.show{animation:finalIn 1.4s cubic-bezier(.2,1.4,.35,1) forwards}
+  @keyframes finalIn{
+    0%{opacity:0;transform:scale(.4) translateY(40px)}
+    55%{opacity:1;transform:scale(1.08) translateY(0)}
+    100%{opacity:1;transform:scale(1) translateY(0)}}
+  #final h2{font-size:clamp(32px,8vw,105px);font-weight:900;line-height:1.1;
+    background:linear-gradient(180deg,#ffffff,#ffe98a 45%,#ff9a2e);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 4px 8px rgba(110,50,0,.6)) drop-shadow(0 0 45px rgba(255,180,60,.9));
+    letter-spacing:-.02em}
+  #final p{margin-top:16px;font-size:clamp(14px,2.8vw,28px);color:#fff6d6;font-weight:700;
+    text-shadow:0 2px 10px rgba(110,50,0,.9),0 0 30px rgba(255,160,50,1)}
+  #final .brand{margin-top:2px;font-size:clamp(12px,2vw,18px);color:#ffe9a8;
+    font-weight:700;letter-spacing:.22em;text-transform:lowercase;
+    opacity:.85;text-shadow:0 2px 10px rgba(110,50,0,.9),0 0 22px rgba(255,180,60,.8);
+    font-family:'Vazirmatn',Tahoma,sans-serif}
+
+  #clickCatcher{
+    position:fixed;inset:0;z-index:12;
+    background:transparent;
+    cursor:pointer;
+    transition:opacity .3s ease;
+  }
+  #clickCatcher.gone{opacity:0;pointer-events:none}
+
+  @media (max-width:520px){
+    #cd{font-size:clamp(48px,12vw,110px)}
+    #clickHint{font-size:clamp(16px,4.5vw,28px);white-space:normal}
+  }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="hud">
+  <div id="cdlabel">تا لحظهٔ تحویل سال ۱۴۰۶</div>
+  <div id="centerStage">
+    <div id="cd">۰۰:۰۰</div>
+    <button id="clickHint" type="button">برای دیدن لحظه‌شمار کلیک اینجا کنید</button>
+  </div>
+  <div id="final">
+    <h2>عید نوروز مبارک</h2>
+    <p>سال ۱۴۰۶ مبارک • بهار آمد 🌷</p>
+    <div class="brand">whatsmusic</div>
+  </div>
+</div>
+
+<div id="clickCatcher"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* =========================================================
+   تنظیمات — تاریخ دقیق لحظهٔ تحویل سال ۱۴۰۶
+   =========================================================
+   شنبه، ۲۹ اسفند ۱۴۰۵ به وقت ایران: 23:54:18
+   2027-03-20  به وقت UTC: 20:24:18
+   ========================================================= */
+const TARGET_UTC_MS = Date.UTC(2027, 2, 20, 20, 24, 18);
+
+const FIREWORK_DURATION = 2;
+const FLOWER_COUNT = 30;
+const BONFIRE_CLEAR_RADIUS = 120;
+const AUTO_REVEAL_THRESHOLD_SECONDS = 5;
+const MUSIC_DELAY_SECONDS = 2;
+const MUSIC_URL = 'music.mp3';
+const MUSIC_VOLUME = 0.85;
+
+const cvs      = document.getElementById('c');
+const ctx      = cvs.getContext('2d', { alpha:false });
+const cdEl     = document.getElementById('cd');
+const cdLabel  = document.getElementById('cdlabel');
+const hud      = document.getElementById('hud');
+const centerStage = document.getElementById('centerStage');
+const clickHint = document.getElementById('clickHint');
+const finalEl  = document.getElementById('final');
+const clickCatcher = document.getElementById('clickCatcher');
+
+let W = 0, H = 0, DPR = 1;
+let vignette = null;
+
+const rand    = (a,b)=> a + Math.random()*(b-a);
+const randInt = (a,b)=> Math.floor(rand(a,b+1));
+const lerp    = (a,b,t)=> a + (b-a)*t;
+const clamp   = (v,a,b)=> v<a?a:(v>b?b:v);
+const mixArr  = (a,b,t)=> [lerp(a[0],b[0],t), lerp(a[1],b[1],t), lerp(a[2],b[2],t)];
+const rgba    = (c,a)=> 'rgba('+(c[0]|0)+','+(c[1]|0)+','+(c[2]|0)+','+a+')';
+const easeOutBack = t => { const c1=1.70158, c3=c1+1; return 1 + c3*Math.pow(t-1,3) + c1*Math.pow(t-1,2); };
+const TAU = Math.PI*2;
+const smoothstep = (a,b,x)=>{ const t=clamp((x-a)/(b-a),0,1); return t*t*(3-2*t); };
+
+const FA_DIGITS = '۰۱۲۳۴۵۶۷۸۹';
+function toFa(str){ return String(str).replace(/\d/g, d=> FA_DIGITS[+d]); }
+function pad2(n){ return n<10 ? '0'+n : ''+n; }
+
+function realClock(remainMs){
+  const total = Math.max(0, Math.ceil(remainMs/1000));
+  const hours = Math.floor(total / 3600);
+  const mins = Math.floor((total % 3600) / 60);
+  const secs = total % 60;
+  if (hours >= 1){
+    return pad2(hours) + ':' + pad2(mins) + ':' + pad2(secs);
+  }
+  return pad2(mins) + ':' + pad2(secs);
+}
+
+const glowCache = {};
+function glow(rgb){
+  const key = rgb.join('_');
+  if (glowCache[key]) return glowCache[key];
+  const s = 128;
+  const c = document.createElement('canvas');
+  c.width = c.height = s;
+  const x = c.getContext('2d');
+  const g = x.createRadialGradient(s/2, s/2, 0, s/2, s/2, s/2);
+  g.addColorStop(0.00, 'rgba(255,255,255,1)');
+  g.addColorStop(0.16, 'rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+',0.95)');
+  g.addColorStop(0.42, 'rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+',0.36)');
+  g.addColorStop(1.00, 'rgba('+rgb[0]+','+rgb[1]+','+rgb[2]+',0)');
+  x.fillStyle = g;
+  x.fillRect(0,0,s,s);
+  glowCache[key] = c;
+  return c;
+}
+const FLAME_SPRITES = [ glow([255,246,205]), glow([255,168,55]), glow([255,72,24]) ];
+const PALETTE = [
+  [255, 92, 92], [255, 205, 70], [120, 255, 150],
+  [ 90, 205, 255], [195, 120, 255], [255, 120, 200], [255, 255, 255]
+];
+PALETTE.forEach(glow);
+
+let stars = [], flowers = [], butterflies = [], flames = [];
+let rockets = [], sparks = [], confetti = [];
+
+let time = 0;
+let state = 'countdown';
+let flash = 0;
+let flameAcc = 0;
+let confAcc = 0;
+let launchTimer = 0;
+let celebrateElapsed = 0;
+let celebrationStartMs = 0;
+
+let nightFactor = 1;
+let smoothNight = 1;
+let veilAlpha = 1;
+
+let fireX = 0, fireY = 0;
+let fireIgnited = false;
+
+let userInteracted = false;
+let autoRevealed = false;
+let musicStarted = false;
+
+let actx = null;
+let musicBuffer = null;
+let musicSource = null;
+let musicGain = null;
+let musicLoading = false;
+
+function getTehranHourFloat(){
+  const IRAN_OFFSET_MS = 3.5 * 3600 * 1000;
+  const tehranMs = Date.now() + IRAN_OFFSET_MS;
+  const d = new Date(tehranMs);
+  return d.getUTCHours() + d.getUTCMinutes()/60 + d.getUTCSeconds()/3600;
+}
+function computeNightFactor(hour){
+  if (hour < 5) return 1;
+  if (hour < 6.5) return 1 - smoothstep(5, 6.5, hour);
+  if (hour < 17) return 0;
+  if (hour < 19) return smoothstep(17, 19, hour);
+  return 1;
+}
+const SKY = {
+  night: { top:[6,10,30], mid:[16,22,58], bot:[42,30,72] },
+  day:   { top:[74,160,224], mid:[142,201,240], bot:[255,230,184] }
+};
+
+function resize(){
+  DPR = Math.min(window.devicePixelRatio || 1, 1.5);
+  W = window.innerWidth;
+  H = window.innerHeight;
+  cvs.width  = Math.floor(W*DPR);
+  cvs.height = Math.floor(H*DPR);
+  cvs.style.width  = W + 'px';
+  cvs.style.height = H + 'px';
+  fireX = W * 0.5;
+  fireY = H * 0.885;
+  buildStars();
+  buildFlowers();
+  buildButterflies();
+  vignette = ctx.createRadialGradient(W/2, H/2, Math.min(W,H)*0.34, W/2, H/2, Math.max(W,H)*0.80);
+  vignette.addColorStop(0, 'rgba(0,0,0,0)');
+  vignette.addColorStop(1, 'rgba(0,0,0,0.42)');
+}
+
+function buildStars(){
+  stars = [];
+  const n = Math.min(180, Math.round(W*H/11000));
+  for (let i=0;i<n;i++){
+    stars.push({
+      x: Math.random()*W, y: Math.random()*H*0.72,
+      r: rand(0.5, 1.9), ph: Math.random()*TAU, sp: rand(0.6, 2.4)
+    });
+  }
+}
+
+const FLOWER_COLORS = ['#ff5d8f','#ff8fc7','#ffd166','#ff7b54','#c792ff','#7ee8fa','#fff0f5','#ff4d6d','#ffb703','#fb8500'];
+
+function buildFlowers(){
+  flowers = [];
+  let guard = 0;
+  while (flowers.length < FLOWER_COUNT && guard < 2000){
+    guard++;
+    const x = rand(W*0.02, W*0.98);
+    const y = rand(H*0.78, H*1.0);
+    const dx = x - fireX, dy = y - fireY;
+    if (Math.sqrt(dx*dx + dy*dy) < BONFIRE_CLEAR_RADIUS) continue;
+    flowers.push({
+      x, y, h: rand(22, 55), r: rand(4.5, 8.5),
+      petals: randInt(5,7), rot: Math.random()*Math.PI,
+      sway: rand(-14, 14),
+      color: FLOWER_COLORS[randInt(0, FLOWER_COLORS.length-1)],
+      delay: rand(0, 1.8), grow: 0
+    });
+  }
+}
+
+function buildButterflies(){
+  butterflies = [];
+  for (let i=0;i<8;i++){
+    butterflies.push({
+      x: Math.random()*W, baseY: rand(H*0.45, H*0.82),
+      amp: rand(18, 66), freq: rand(0.4, 1.0),
+      ph: Math.random()*TAU, speed: rand(22, 58),
+      size: rand(6, 12), color: PALETTE[randInt(0,5)]
+    });
+  }
+}
+
+function launchFirework(){
+  const color = PALETTE[randInt(0, PALETTE.length-1)];
+  const types = ['sphere','sphere','ring','willow','palm'];
+  const type  = types[randInt(0, types.length-1)];
+  rockets.push({
+    x: rand(W*0.08, W*0.92), y: H*0.92,
+    vx: rand(-40, 40), vy: -rand(540, 680),
+    color, type, trail: []
+  });
+}
+
+function explode(x, y, rgb, type, withFlash){
+  const spr = glow(rgb);
+  let count = 120, lifeMin = 1.1, lifeMax = 2.0, grav = 105, drag = 0.955, sMin = 5, sMax = 11;
+  if (type === 'ring')       { count = 90; }
+  else if (type === 'willow'){ count = 105; lifeMin = 2.4; lifeMax = 3.6; grav = 128; drag = 0.976; sMin = 5; sMax = 10; }
+  else if (type === 'palm')  { count = 65;  lifeMin = 1.6; lifeMax = 2.6; grav = 95;  drag = 0.965; sMin = 9; sMax = 16; }
+  if (sparks.length > 600) count = Math.floor(count * 0.5);
+  for (let i=0;i<count;i++){
+    let ang, spd;
+    if (type === 'ring'){ ang = (i/count)*TAU + rand(-0.03, 0.03); spd = rand(155, 210); }
+    else if (type === 'willow'){ ang = Math.random()*TAU; spd = rand(40, 175); }
+    else if (type === 'palm'){ ang = Math.random()*TAU; spd = rand(95, 265); }
+    else { ang = Math.random()*TAU; spd = Math.sqrt(Math.random()) * rand(60, 310); }
+    const L = rand(lifeMin, lifeMax);
+    sparks.push({
+      x, y, px:x, py:y,
+      vx: Math.cos(ang)*spd, vy: Math.sin(ang)*spd,
+      life: L, maxLife: L, g: grav, drag,
+      size: rand(sMin, sMax), alpha: rand(0.75, 1), rgb, spr
+    });
+  }
+  for (let i=0;i<18;i++){
+    const ang = Math.random()*TAU;
+    const spd = rand(20, 90);
+    const L = rand(0.5, 1.0);
+    sparks.push({
+      x, y, px:x, py:y,
+      vx: Math.cos(ang)*spd, vy: Math.sin(ang)*spd,
+      life: L, maxLife: L, g:80, drag:0.94,
+      size: rand(10,18), alpha:0.9,
+      rgb:[255,255,255], spr: glow([255,255,255])
+    });
+  }
+  if (withFlash) flash = 1;
+  if (userInteracted) boom();
+}
+
+function spawnFlame(){
+  flames.push({
+    x: fireX + rand(-16, 16), y: fireY - rand(0, 12),
+    vx: rand(-26, 26), vy: rand(-175, -95),
+    life: 1, decay: rand(0.85, 1.45),
+    size: rand(18, 40), ph: Math.random()*TAU
+  });
+}
+
+const CONF_COLORS = ['#ff5d8f','#ffd166','#7ee8fa','#c792ff','#ff7b54','#8dff9e','#ffffff','#ff4d6d'];
+function spawnConfetti(initial){
+  confetti.push({
+    x: rand(-20, W+20),
+    y: initial ? rand(-H*0.6, H*0.4) : rand(-80, -20),
+    vx: rand(-40, 40), vy: rand(40, 110),
+    w: rand(6, 13), h: rand(8, 18),
+    rot: Math.random()*TAU, vrot: rand(-5, 5),
+    sw: rand(1.2, 3.2), ph: Math.random()*TAU,
+    color: CONF_COLORS[randInt(0, CONF_COLORS.length-1)]
+  });
+}
+
+function initAudio(){
+  if (actx) return;
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    actx = new AC();
+  } catch(e){ actx = null; }
+}
+
+function loadMusic(){
+  if (!actx || musicBuffer || musicLoading) return;
+  musicLoading = true;
+  fetch(MUSIC_URL)
+    .then(function(resp){
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      return resp.arrayBuffer();
+    })
+    .then(function(arrayBuf){
+      return actx.decodeAudioData(arrayBuf);
+    })
+    .then(function(buffer){
+      musicBuffer = buffer;
+      musicLoading = false;
+      console.log('موسیقی بارگذاری شد — مدت: ' + buffer.duration.toFixed(2) + ' ثانیه');
+    })
+    .catch(function(err){
+      musicLoading = false;
+      console.warn('بارگذاری موسیقی ناموفق بود:', err);
+    });
+}
+
+function playMusic(){
+  if (musicStarted || !actx || !musicBuffer) return;
+  musicStarted = true;
+
+  if (actx.state === 'suspended') actx.resume();
+
+  musicGain = actx.createGain();
+  musicGain.gain.setValueAtTime(0.0001, actx.currentTime);
+  musicGain.gain.exponentialRampToValueAtTime(MUSIC_VOLUME, actx.currentTime + 2);
+  musicGain.connect(actx.destination);
+
+  musicSource = actx.createBufferSource();
+  musicSource.buffer = musicBuffer;
+  musicSource.loop = true;
+  musicSource.connect(musicGain);
+  musicSource.start(0);
+}
+
+function boom(){
+  if (!actx) return;
+  if (actx.state === 'suspended') actx.resume();
+  const dur = 1.9, sr = actx.sampleRate;
+  const buf = actx.createBuffer(1, Math.floor(sr*dur), sr);
+  const d = buf.getChannelData(0);
+  let last = 0;
+  for (let i=0;i<d.length;i++){
+    const t = i/d.length;
+    const noise = Math.random()*2-1;
+    last = last*0.86 + noise*0.14;
+    d[i] = (last*3.1 + noise*0.32) * Math.pow(1-t, 3.0);
+  }
+  const src = actx.createBufferSource(); src.buffer = buf;
+  const filt = actx.createBiquadFilter();
+  filt.type = 'lowpass'; filt.frequency.value = 1300;
+  const g = actx.createGain(); g.gain.value = 0.22;
+  src.connect(filt); filt.connect(g); g.connect(actx.destination);
+  src.start();
+}
+
+function unlockAudioOnce(){
+  initAudio();
+  if (actx && actx.state === 'suspended'){
+    actx.resume().then(function(){
+      const g = actx.createGain();
+      g.gain.value = 0;
+      g.connect(actx.destination);
+      const o = actx.createOscillator();
+      o.connect(g);
+      o.start();
+      o.stop(actx.currentTime + 0.01);
+    });
+  }
+  if (!musicBuffer && !musicLoading) loadMusic();
+}
+
+function onUserClick(){
+  if (userInteracted) return;
+  userInteracted = true;
+  unlockAudioOnce();
+
+  hud.classList.add('revealed');
+  centerStage.classList.add('revealed');
+  clickCatcher.classList.add('gone');
+  setTimeout(function(){ clickHint.classList.add('removed'); }, 800);
+}
+
+clickCatcher.addEventListener('pointerdown', onUserClick, { once:true });
+clickCatcher.addEventListener('click', onUserClick, { once:true });
+window.addEventListener('keydown', onUserClick, { once:true });
+
+function onLateInteraction(){
+  if (state !== 'celebrate') return;
+  if (musicStarted) return;
+
+  unlockAudioOnce();
+
+  const elapsed = (Date.now() - celebrationStartMs) / 1000;
+  if (musicBuffer && elapsed >= MUSIC_DELAY_SECONDS){
+    playMusic();
+  }
+}
+
+document.addEventListener('pointerdown', onLateInteraction);
+document.addEventListener('click', onLateInteraction);
+document.addEventListener('touchstart', onLateInteraction, {passive:true});
+window.addEventListener('keydown', onLateInteraction);
+
+function startCelebration(silent){
+  if (state === 'celebrate') return;
+  state = 'celebrate';
+  celebrateElapsed = 0;
+  celebrationStartMs = Date.now();
+  centerStage.classList.add('hide');
+  cdLabel.style.opacity = '0';
+  fireIgnited = true;
+
+  if (!silent && userInteracted) boom();
+  explode(W*0.5, H*0.24, [255,205,70], 'sphere', true);
+  setTimeout(function(){ if (!silent && userInteracted) boom(); }, 200);
+
+  for (let i=0;i<6;i++){
+    setTimeout(function(){
+      launchFirework();
+    }, i*160 + Math.random()*130);
+  }
+
+  setTimeout(function(){ finalEl.classList.add('show'); }, 700);
+  launchTimer = 0.15;
+  for (let i=0;i<90;i++) spawnConfetti(true);
+
+  setTimeout(function(){
+    if (musicBuffer && actx && actx.state === 'running' && !musicStarted){
+      playMusic();
+    }
+  }, MUSIC_DELAY_SECONDS * 1000);
+}
+
+function update(dt){
+  time += dt;
+  const tehranHour = getTehranHourFloat();
+  nightFactor = computeNightFactor(tehranHour);
+  smoothNight += (nightFactor - smoothNight) * Math.min(1, dt*0.8);
+  const veilTarget = (state === 'celebrate') ? 0 : 1;
+  veilAlpha += (veilTarget - veilAlpha) * Math.min(1, dt*1.2);
+  if (state === 'celebrate' && veilAlpha < 0.005) veilAlpha = 0;
+
+  flash = Math.max(0, flash - dt*1.7);
+
+  if (state === 'celebrate' && !musicStarted && musicBuffer && actx && actx.state === 'running'){
+    const elapsed = (Date.now() - celebrationStartMs) / 1000;
+    if (elapsed >= MUSIC_DELAY_SECONDS){
+      playMusic();
+    }
+  }
+
+  if (state === 'countdown'){
+    const now = Date.now();
+    const remain = TARGET_UTC_MS - now;
+
+    if (!userInteracted && !autoRevealed && remain <= AUTO_REVEAL_THRESHOLD_SECONDS * 1000 && remain > 0){
+      autoRevealed = true;
+      hud.classList.add('revealed');
+      centerStage.classList.add('revealed');
+      clickCatcher.classList.add('gone');
+      setTimeout(function(){ clickHint.classList.add('removed'); }, 800);
+    }
+
+    if (userInteracted || autoRevealed){
+      const faText = toFa(realClock(remain));
+      if (cdEl.textContent !== faText) cdEl.textContent = faText;
+    }
+
+    if (remain <= 0){
+      startCelebration(!userInteracted);
+    }
+  }
+
+  if (state === 'celebrate'){
+    celebrateElapsed += dt;
+    for (let i=0;i<flowers.length;i++){
+      const f = flowers[i];
+      if (f.grow < 1) f.grow = clamp((celebrateElapsed - f.delay) / 0.85, 0, 1);
+    }
+    const fireworksEnded = celebrateElapsed >= FIREWORK_DURATION;
+    if (!fireworksEnded){
+      launchTimer -= dt;
+      if (launchTimer <= 0){
+        launchFirework();
+        launchTimer = rand(0.15, 0.40);
+      }
+    }
+    confAcc += dt * 30;
+    while (confAcc >= 1){
+      confAcc -= 1;
+      if (confetti.length < 260) spawnConfetti(false);
+    }
+  }
+
+  if (fireIgnited){
+    flameAcc += dt * 200;
+    while (flameAcc >= 1){
+      flameAcc -= 1;
+      if (flames.length < 170) spawnFlame();
+    }
+    for (let i=flames.length-1;i>=0;i--){
+      const p = flames[i];
+      p.life -= p.decay * dt;
+      if (p.life <= 0){ flames.splice(i,1); continue; }
+      p.x += (p.vx + Math.sin(time*3.2 + p.ph)*24) * dt;
+      p.y += p.vy * dt;
+      p.vy *= Math.pow(0.55, dt);
+      p.vx *= Math.pow(0.25, dt);
+    }
+  }
+
+  for (let i=rockets.length-1;i>=0;i--){
+    const r = rockets[i];
+    r.vy += 300 * dt;
+    r.x  += r.vx * dt;
+    r.y  += r.vy * dt;
+    r.trail.push({x:r.x, y:r.y});
+    if (r.trail.length > 8) r.trail.shift();
+    if (r.vy >= -35){
+      explode(r.x, r.y, r.color, r.type, false);
+      rockets.splice(i,1);
+    }
+  }
+
+  for (let i=sparks.length-1;i>=0;i--){
+    const p = sparks[i];
+    p.life -= dt;
+    if (p.life <= 0){ sparks.splice(i,1); continue; }
+    p.px = p.x; p.py = p.y;
+    p.vy += p.g * dt;
+    const dr = Math.pow(p.drag, dt*60);
+    p.vx *= dr; p.vy *= dr;
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+  }
+
+  for (let i=confetti.length-1;i>=0;i--){
+    const c = confetti[i];
+    c.vy = Math.min(c.vy + 30*dt, 170);
+    c.y += c.vy * dt;
+    c.x += (c.vx + Math.sin(time*c.sw + c.ph)*45) * dt;
+    c.rot += c.vrot * dt;
+    if (c.y > H + 50) confetti.splice(i,1);
+  }
+
+  for (let i=0;i<butterflies.length;i++){
+    const b = butterflies[i];
+    b.x += b.speed * dt;
+    if (b.x > W + 40){ b.x = -40; b.baseY = rand(H*0.45, H*0.82); }
+  }
+}
+
+const HILLS = [
+  { y:0.695, amp:26, freq:0.0020, phase:0.6, col:[88,164,104] },
+  { y:0.775, amp:34, freq:0.0026, phase:2.3, col:[66,144,88]  },
+  { y:0.865, amp:40, freq:0.0033, phase:4.5, col:[48,122,70]  }
+];
+
+function getSunPosition(hour){
+  const t = (hour - 6.5) / (17.5 - 6.5);
+  const x = W * lerp(0.12, 0.88, clamp(t, 0, 1));
+  const y = H * (0.42 - 0.30 * Math.sin(clamp(t,0,1) * Math.PI));
+  return { x, y, visible: t > -0.05 && t < 1.05 };
+}
+function getMoonPosition(hour){
+  let t;
+  if (hour >= 19.5) t = (hour - 19.5) / 10;
+  else t = (hour + 4.5) / 10;
+  const x = W * lerp(0.15, 0.85, clamp(t, 0, 1));
+  const y = H * (0.40 - 0.28 * Math.sin(clamp(t,0,1) * Math.PI));
+  return { x, y, visible: true };
+}
+
+function drawSky(){
+  const n = smoothNight;
+  const top = mixArr(SKY.day.top, SKY.night.top, n);
+  const mid = mixArr(SKY.day.mid, SKY.night.mid, n);
+  const bot = mixArr(SKY.day.bot, SKY.night.bot, n);
+  const g = ctx.createLinearGradient(0, 0, 0, H*0.95);
+  g.addColorStop(0, rgba(top, 1));
+  g.addColorStop(0.42, rgba(mid, 1));
+  g.addColorStop(1, rgba(bot, 1));
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+
+  const sun = getSunPosition(getTehranHourFloat());
+  if (sun.visible && n < 0.98){
+    const sr = Math.min(W,H)*0.34;
+    const dayStrength = 1 - n;
+    const sg = ctx.createRadialGradient(sun.x, sun.y, 0, sun.x, sun.y, sr);
+    sg.addColorStop(0,    'rgba(255,250,220,' + (0.95*dayStrength) + ')');
+    sg.addColorStop(0.14, 'rgba(255,235,150,' + (0.55*dayStrength) + ')');
+    sg.addColorStop(0.45, 'rgba(255,215,120,' + (0.16*dayStrength) + ')');
+    sg.addColorStop(1,    'rgba(255,200,100,0)');
+    ctx.fillStyle = sg;
+    ctx.beginPath(); ctx.arc(sun.x, sun.y, sr, 0, TAU); ctx.fill();
+  }
+
+  if (n > 0.05){
+    const moon = getMoonPosition(getTehranHourFloat());
+    const mr = Math.min(W,H)*0.036;
+    const a = n;
+    const mg = ctx.createRadialGradient(moon.x, moon.y, mr*0.5, moon.x, moon.y, mr*6);
+    mg.addColorStop(0, 'rgba(255,250,215,' + (0.28*a) + ')');
+    mg.addColorStop(1, 'rgba(255,250,215,0)');
+    ctx.fillStyle = mg;
+    ctx.beginPath(); ctx.arc(moon.x, moon.y, mr*6, 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.arc(moon.x, moon.y, mr, 0, TAU);
+    ctx.fillStyle = 'rgba(255,252,232,' + (0.92*a) + ')';
+    ctx.fill();
+    ctx.beginPath(); ctx.arc(moon.x - mr*0.28, moon.y - mr*0.22, mr*0.16, 0, TAU);
+    ctx.fillStyle = 'rgba(230,225,200,' + (0.30*a) + ')';
+    ctx.fill();
+    ctx.beginPath(); ctx.arc(moon.x + mr*0.22, moon.y + mr*0.18, mr*0.11, 0, TAU);
+    ctx.fill();
+  }
+}
+
+function drawStars(){
+  const a = smoothNight;
+  if (a <= 0.05) return;
+  ctx.fillStyle = '#ffffff';
+  for (let i=0;i<stars.length;i++){
+    const s = stars[i];
+    const tw = 0.55 + 0.45*Math.sin(time*s.sp + s.ph);
+    ctx.globalAlpha = a * tw * 0.9;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, TAU);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawHills(){
+  const n = smoothNight;
+  for (let k=0;k<HILLS.length;k++){
+    const h = HILLS[k];
+    const baseY = H*h.y;
+    ctx.beginPath();
+    ctx.moveTo(0, H);
+    for (let x=0; x<=W+12; x+=14){
+      const y = baseY
+        + Math.sin(x*h.freq + h.phase) * h.amp
+        + Math.sin(x*h.freq*2.7 + h.phase*1.9) * h.amp*0.30;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(W, H);
+    ctx.closePath();
+    const dayCol   = [h.col[0]+42, h.col[1]+38, h.col[2]+22];
+    const nightCol = [h.col[0]*0.35, h.col[1]*0.38, h.col[2]*0.45];
+    const top = mixArr(dayCol, nightCol, n);
+    const bottom = mixArr(h.col, [h.col[0]*0.22, h.col[1]*0.24, h.col[2]*0.30], n);
+    const g = ctx.createLinearGradient(0, baseY - h.amp, 0, H);
+    g.addColorStop(0, rgba(top, 1));
+    g.addColorStop(1, rgba(bottom, 1));
+    ctx.fillStyle = g;
+    ctx.fill();
+  }
+}
+
+function drawFlowers(){
+  ctx.lineCap = 'round';
+  for (let i=0;i<flowers.length;i++){
+    const f = flowers[i];
+    if (f.grow <= 0.002) continue;
+    const eg = easeOutBack(f.grow);
+    const hh = f.h * eg;
+    if (hh < 1) continue;
+    const x = f.x, y = f.y;
+    const tipX = x + f.sway * eg;
+    const tipY = y - hh;
+    ctx.strokeStyle = 'rgba(48,124,60,0.95)';
+    ctx.lineWidth = Math.max(0.9, 1.6*eg);
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.quadraticCurveTo(x + f.sway*0.3, y - hh*0.55, tipX, tipY);
+    ctx.stroke();
+    const pr = f.r * clamp(eg, 0, 1.15);
+    for (let p=0;p<f.petals;p++){
+      const a = (p/f.petals)*TAU + f.rot;
+      ctx.beginPath();
+      ctx.ellipse(tipX + Math.cos(a)*pr*0.75, tipY + Math.sin(a)*pr*0.75,
+                  pr*0.72, pr*0.44, a, 0, TAU);
+      ctx.fillStyle = f.color;
+      ctx.fill();
+    }
+    ctx.beginPath();
+    ctx.arc(tipX, tipY, pr*0.42, 0, TAU);
+    ctx.fillStyle = '#ffd75e';
+    ctx.fill();
+  }
+}
+
+function drawButterflies(){
+  for (let i=0;i<butterflies.length;i++){
+    const b = butterflies[i];
+    const flap = Math.abs(Math.sin(time*9 + b.ph));
+    const y = b.baseY + Math.sin(time*b.freq + b.ph) * b.amp;
+    ctx.save();
+    ctx.translate(b.x, y);
+    ctx.globalAlpha = 0.92;
+    ctx.fillStyle = rgba(b.color, 0.95);
+    ctx.beginPath();
+    ctx.ellipse(-b.size*0.55, 0, b.size*0.62*(0.32+0.68*flap), b.size*0.5, -0.42, 0, TAU);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse( b.size*0.55, 0, b.size*0.62*(0.32+0.68*flap), b.size*0.5,  0.42, 0, TAU);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(40,25,15,.92)';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, b.size*0.12, b.size*0.5, 0, 0, TAU);
+    ctx.fill();
+    ctx.restore();
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawBonfireBase(){
+  if (!fireIgnited) return;
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  const gr = ctx.createRadialGradient(fireX, fireY, 0, fireX, fireY, Math.min(W,H)*0.48);
+  gr.addColorStop(0,   'rgba(255,155,55,0.30)');
+  gr.addColorStop(0.38,'rgba(255,95,25,0.10)');
+  gr.addColorStop(1,   'rgba(255,60,0,0)');
+  ctx.fillStyle = gr;
+  ctx.fillRect(0,0,W,H);
+  ctx.restore();
+  ctx.save();
+  ctx.translate(fireX, fireY);
+  const logs = [[-0.55, 98], [0.45, 92], [0.06, 80]];
+  for (let i=0;i<logs.length;i++){
+    ctx.save();
+    ctx.rotate(logs[i][0]);
+    const len = logs[i][1];
+    ctx.fillStyle = '#3a2415';
+    ctx.fillRect(-len/2, -8, len, 16);
+    ctx.fillStyle = '#54341d';
+    ctx.fillRect(-len/2, -8, len, 6);
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
+function drawFlames(){
+  if (!fireIgnited) return;
+  for (let i=0;i<flames.length;i++){
+    const p = flames[i];
+    const t = p.life;
+    if (t <= 0) continue;
+    let spr;
+    if (t > 0.62)      spr = FLAME_SPRITES[0];
+    else if (t > 0.30) spr = FLAME_SPRITES[1];
+    else               spr = FLAME_SPRITES[2];
+    const size = p.size * (0.7 + (1-t)*1.25);
+    ctx.globalAlpha = Math.min(1, t*1.5) * 0.8;
+    ctx.drawImage(spr, p.x - size/2, p.y - size/2, size, size);
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawRockets(){
+  for (let i=0;i<rockets.length;i++){
+    const r = rockets[i];
+    if (r.trail.length > 1){
+      ctx.beginPath();
+      ctx.moveTo(r.trail[0].x, r.trail[0].y);
+      for (let j=1;j<r.trail.length;j++) ctx.lineTo(r.trail[j].x, r.trail[j].y);
+      ctx.strokeStyle = rgba(r.color, 0.55);
+      ctx.lineWidth = 2.6;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+    }
+    const spr = glow(r.color);
+    const s = 30;
+    ctx.globalAlpha = 0.95;
+    ctx.drawImage(spr, r.x - s/2, r.y - s/2, s, s);
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawSparks(){
+  for (let i=0;i<sparks.length;i++){
+    const p = sparks[i];
+    if (p.life <= 0) continue;
+    const a = clamp(p.life / p.maxLife, 0, 1);
+    if (p.size > 7){
+      ctx.strokeStyle = rgba(p.rgb, a*0.35);
+      ctx.lineWidth = p.size*0.3;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(p.px, p.py);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+    }
+    const size = p.size * (0.45 + a*0.95);
+    ctx.globalAlpha = a * p.alpha;
+    ctx.drawImage(p.spr, p.x - size/2, p.y - size/2, size, size);
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawConfetti(){
+  for (let i=0;i<confetti.length;i++){
+    const c = confetti[i];
+    ctx.save();
+    ctx.translate(c.x, c.y);
+    ctx.rotate(c.rot);
+    ctx.fillStyle = c.color;
+    ctx.fillRect(-c.w/2, -c.h/2, c.w, c.h);
+    ctx.restore();
+  }
+}
+
+function draw(){
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.globalAlpha = 1;
+  drawSky();
+  drawStars();
+  drawHills();
+  drawBonfireBase();
+  drawFlowers();
+  drawButterflies();
+  drawConfetti();
+  ctx.globalCompositeOperation = 'lighter';
+  drawFlames();
+  drawSparks();
+  drawRockets();
+  ctx.globalCompositeOperation = 'source-over';
+  if (veilAlpha > 0.001){
+    ctx.fillStyle = 'rgba(3,7,20,' + (veilAlpha*0.62) + ')';
+    ctx.fillRect(0, 0, W, H);
+  }
+  if (flash > 0.001){
+    ctx.fillStyle = 'rgba(255,250,230,' + (flash*0.55) + ')';
+    ctx.fillRect(0, 0, W, H);
+  }
+  if (vignette){
+    ctx.fillStyle = vignette;
+    ctx.fillRect(0, 0, W, H);
+  }
+}
+
+const FIXED_DT = 1/60;
+let acc = 0;
+let lastT = performance.now();
+
+function loop(now){
+  requestAnimationFrame(loop);
+  let delta = (now - lastT) / 1000;
+  lastT = now;
+  if (delta > 0.1) delta = 0.1;
+  acc += delta;
+  let steps = 0;
+  while (acc >= FIXED_DT && steps < 5){
+    update(FIXED_DT);
+    acc -= FIXED_DT;
+    steps++;
+  }
+  draw();
+}
+
+window.addEventListener('resize', resize);
+
+resize();
+requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+</html>
